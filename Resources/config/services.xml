@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="bernard.router" class="Bernard\Symfony\ContainerAwareRouter">
+            <argument type="service" id="service_container" />
+            <argument type="collection" /><!-- Receivers -->
+        </service>
+
+        <service id="bernard.consumer" class="Bernard\Consumer">
+            <argument type="service" id="bernard.router" />
+            <argument type="service" id="bernard.middleware_consumer" />
+        </service>
+
+        <service id="bernard.producer" class="Bernard\Producer">
+            <argument type="service" id="bernard.queue_factory" />
+            <argument type="service" id="bernard.middleware_producer" />
+        </service>
+
+        <service id="bernard.queue_factory" class="Bernard\QueueFactory\PersistentFactory" public="false">
+            <argument type="service" id="bernard.driver" />
+            <argument type="service" id="bernard.serializer" />
+        </service>
+
+        <service id="bernard.middleware_consumer" class="Bernard\Middleware\MiddlewareBuilder" public="false" />
+
+        <service id="bernard.middleware_producer" class="Bernard\Middleware\MiddlewareBuilder" public="false" />
+
+        <!-- EventListener -->
+        <service id="bernard.schema_listener" class="Bernard\BernardBundle\EventListener\SchemaListener" public="false" />
+
+        <!-- commands -->
+        <service id="bernard.consume_command" class="Bernard\Command\ConsumeCommand">
+            <argument type="service" id="bernard.consumer" />
+            <argument type="service" id="bernard.queue_factory" />
+        </service>
+
+        <service id="bernard.produce_command" class="Bernard\Command\ProduceCommand">
+            <argument type="service" id="bernard.producer" />
+        </service>
+
+        <!-- Normalizers -->
+        <service id="bernard.symfony.normalizer" class="Bernard\Symfony\EnvelopeNormalizer" public="false">
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <!-- Serializers -->
+        <service id="bernard.serializer.simple" class="Bernard\Serializer\SimpleSerializer" public="false" />
+
+        <service id="bernard.serializer.symfony" class="Bernard\Serializer\SymfonySerializer" public="false">
+            <argument type="service" id="serializer" />
+        </service>
+
+        <service id="bernard.serializer.jms" class="Bernard\Serializer\JMSSerializer" public="false">
+            <argument type="service" id="jms_serializer" />
+        </service>
+
+        <!-- Drivers -->
+        <service id="bernard.driver.predis" class="Bernard\Driver\PredisDriver" public="false">
+            <argument type="service" id="snc_redis.bernard" />
+        </service>
+
+        <service id="bernard.driver.phpredis" class="Bernard\Driver\PhpRedisDriver" public="false">
+            <argument type="service" id="snc_redis.bernard" />
+        </service>
+
+        <service id="bernard.driver.file" class="Bernard\Driver\FlatFileDriver" public="false">
+            <argument /><!-- base directory -->
+        </service>
+
+        <service id="bernard.driver.doctrine" class="Bernard\Driver\DoctrineDriver" public="false">
+            <argument type="service" id="bernard.dbal_connection" />
+        </service>
+
+        <service id="bernard.driver.ironmq" class="Bernard\Driver\IronMqDriver" public="false">
+            <argument /><!-- IronMQ connection instance -->
+        </service>
+
+        <service id="bernard.driver.sqs" class="Bernard\Driver\SqsDriver" public="false">
+            <argument /><!-- SQS client-->
+            <argument /><!-- queue map -->
+            <argument /><!-- prefetch -->
+        </service>
+
+        <!-- Middlewares -->
+        <service id="bernard.middleware.error_log" class="Bernard\Middleware\ErrorLogFactory" public="false" />
+
+        <service id="bernard.middleware.logger" class="Bernard\Middleware\Logger" public="false">
+            <argument type="service" id="logger" />
+        </service>
+
+        <service id="bernard.middleware.failures" class="Bernard\Middleware\FailuresFactory" public="false">
+            <argument type="service" id="bernard.queue_factory" />
+        </service>
+    </services>
+</container>
