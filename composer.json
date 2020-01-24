@@ -1,6 +1,6 @@
 {
-    "name" : "bernard/bernard-bundle",
-    "description" : "Integrates Bernard into a Symfony2 application.",
+    "name" : "naroga/bernard-bundle",
+    "description" : "Integrates Bernard into a Symfony2+ application.",
     "type" : "symfony-bundle",
     "license" : "MIT",
 
@@ -9,8 +9,7 @@
     },
 
     "require" : {
-        "bernard/bernard" : ">=0.11,<0.13",
-        "symfony/framework-bundle" : "~2.1"
+        "bernard/bernard" : ">=0.11,<0.13"
     },
 
     "require-dev" : {
